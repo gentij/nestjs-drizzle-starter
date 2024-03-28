@@ -8,11 +8,15 @@ import { SnakeNamingStrategy } from './src/snake-naming.strategy';
 
 dotenv.config();
 
+console.log('padsa , ', process.env.DB_USERNAME);
+
 export const dataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
-  username: process.env.DB_USERNAME,
+  ...(process.env.NODE_ENV !== 'development'
+    ? { username: process.env.DB_USERNAME }
+    : null),
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   namingStrategy: new SnakeNamingStrategy(),

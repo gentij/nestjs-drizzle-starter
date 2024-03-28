@@ -55,6 +55,9 @@ import { SharedModule } from './shared/shared.module';
           throw new Error('Invalid options passed');
         }
 
+        if (process.env.NODE_ENV === 'development')
+          delete (options as any).username;
+
         return Promise.resolve(
           addTransactionalDataSource(new DataSource(options)),
         );
