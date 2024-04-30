@@ -23,7 +23,7 @@ export class UsersService {
 
     const user = await this.conn
       .insert(schema.users)
-      .values(createUserDto)
+      .values({ ...createUserDto, role_id: 1 })
       .returning();
 
     return user;
