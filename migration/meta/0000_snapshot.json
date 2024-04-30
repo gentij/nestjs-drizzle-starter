@@ -1,11 +1,11 @@
 {
-  "id": "e1af99b7-8a93-4552-a24a-36b53a9f2ed5",
+  "id": "36bb74e6-fd5d-486f-84d3-6bc7ede34ad6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "cities": {
-      "name": "cities",
+    "users": {
+      "name": "users",
       "schema": "",
       "columns": {
         "id": {
@@ -14,14 +14,38 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
         },
-        "country_id": {
-          "name": "country_id",
+        "email": {
+          "name": "email",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role_id": {
+          "name": "role_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -29,12 +53,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "cities_country_id_countries_id_fk": {
-          "name": "cities_country_id_countries_id_fk",
-          "tableFrom": "cities",
-          "tableTo": "countries",
+        "users_role_id_users_id_fk": {
+          "name": "users_role_id_users_id_fk",
+          "tableFrom": "users",
+          "tableTo": "users",
           "columnsFrom": [
-            "country_id"
+            "role_id"
           ],
           "columnsTo": [
             "id"
@@ -46,8 +70,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "countries": {
-      "name": "countries",
+    "roles": {
+      "name": "roles",
       "schema": "",
       "columns": {
         "id": {
@@ -58,29 +82,7 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
         }
