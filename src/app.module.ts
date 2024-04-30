@@ -8,10 +8,11 @@ import {
   ForbiddenExceptionFilter,
   NotFoundExceptionFilter,
 } from './core/filters';
-import { UsersModule } from './modules/users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { NestDrizzleModule } from './modules/drizzle/drizzle.module';
 import * as schema from './modules/drizzle/schema';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import * as schema from './modules/drizzle/schema';
         };
       },
     }),
+    AuthModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
