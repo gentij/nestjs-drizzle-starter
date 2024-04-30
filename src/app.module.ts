@@ -1,6 +1,4 @@
 import { Module, ValidationError, ValidationPipe } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import {
   AllExceptionsFilter,
@@ -30,10 +28,7 @@ import * as schema from './modules/drizzle/schema';
       },
     }),
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
-
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_FILTER, useClass: ValidationExceptionFilter },
     { provide: APP_FILTER, useClass: BadRequestExceptionFilter },
