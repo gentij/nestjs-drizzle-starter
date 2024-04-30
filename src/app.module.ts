@@ -1,86 +1,54 @@
-import './boilerplate.polyfill';
-
-import path from 'node:path';
-
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ClsModule } from 'nestjs-cls';
+import { Module, ValidationError, ValidationPipe } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import {
-  AcceptLanguageResolver,
-  HeaderResolver,
-  I18nModule,
-  QueryResolver,
-} from 'nestjs-i18n';
-import { DataSource } from 'typeorm';
-import { addTransactionalDataSource } from 'typeorm-transactional';
-
-import { AuthModule } from './modules/auth/auth.module';
-import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
-import { PostModule } from './modules/post/post.module';
-import { UserModule } from './modules/user/user.module';
-import { ApiConfigService } from './shared/services/api-config.service';
-import { SharedModule } from './shared/shared.module';
+  AllExceptionsFilter,
+  ValidationExceptionFilter,
+  BadRequestExceptionFilter,
+  UnauthorizedExceptionFilter,
+  ForbiddenExceptionFilter,
+  NotFoundExceptionFilter,
+} from './core/filters';
+import { UsersModule } from './modules/users/users.module';
+import { ConfigModule } from '@nestjs/config';
+import { NestDrizzleModule } from './modules/drizzle/drizzle.module';
+import * as schema from './modules/drizzle/schema';
 
 @Module({
   imports: [
-    AuthModule,
-    UserModule,
-    PostModule,
-    ClsModule.forRoot({
-      global: true,
-      middleware: {
-        mount: true,
+    UsersModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    NestDrizzleModule.forRootAsync({
+      useFactory: () => {
+        return {
+          driver: 'postgres-js',
+          url: process.env.DATABASE_URL,
+          options: { schema },
+          migrationOptions: { migrationsFolder: './migration' },
+        };
       },
     }),
-    ThrottlerModule.forRootAsync({
-      imports: [SharedModule],
-      useFactory: (configService: ApiConfigService) => ({
-        throttlers: [configService.throttlerConfigs],
-      }),
-      inject: [ApiConfigService],
-    }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-    }),
-    TypeOrmModule.forRootAsync({
-      imports: [SharedModule],
-      useFactory: (configService: ApiConfigService) =>
-        configService.postgresConfig,
-      inject: [ApiConfigService],
-      dataSourceFactory: (options) => {
-        if (!options) {
-          throw new Error('Invalid options passed');
-        }
-
-        if (process.env.NODE_ENV === 'development')
-          delete (options as any).username;
-
-        return Promise.resolve(
-          addTransactionalDataSource(new DataSource(options)),
-        );
-      },
-    }),
-    I18nModule.forRootAsync({
-      useFactory: (configService: ApiConfigService) => ({
-        fallbackLanguage: configService.fallbackLanguage,
-        loaderOptions: {
-          path: path.join(__dirname, '/i18n/'),
-          watch: configService.isDevelopment,
-        },
-        resolvers: [
-          { use: QueryResolver, options: ['lang'] },
-          AcceptLanguageResolver,
-          new HeaderResolver(['x-lang']),
-        ],
-      }),
-      imports: [SharedModule],
-      inject: [ApiConfigService],
-    }),
-    HealthCheckerModule,
   ],
-  providers: [],
+  controllers: [AppController],
+  providers: [
+    AppService,
+
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    { provide: APP_FILTER, useClass: ValidationExceptionFilter },
+    { provide: APP_FILTER, useClass: BadRequestExceptionFilter },
+    { provide: APP_FILTER, useClass: UnauthorizedExceptionFilter },
+    { provide: APP_FILTER, useClass: ForbiddenExceptionFilter },
+    { provide: APP_FILTER, useClass: NotFoundExceptionFilter },
+    {
+      provide: APP_PIPE,
+      useFactory: () =>
+        new ValidationPipe({
+          exceptionFactory: (errors: ValidationError[]) => {
+            return errors[0];
+          },
+        }),
+    },
+  ],
 })
 export class AppModule {}
