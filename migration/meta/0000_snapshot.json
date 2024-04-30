@@ -1,5 +1,5 @@
 {
-  "id": "36bb74e6-fd5d-486f-84d3-6bc7ede34ad6",
+  "id": "894cb1b9-532d-4f08-ba04-a135e988b29f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -53,10 +53,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "users_role_id_users_id_fk": {
-          "name": "users_role_id_users_id_fk",
+        "users_role_id_roles_id_fk": {
+          "name": "users_role_id_roles_id_fk",
           "tableFrom": "users",
-          "tableTo": "users",
+          "tableTo": "roles",
           "columnsFrom": [
             "role_id"
           ],

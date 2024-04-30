@@ -9,7 +9,7 @@ export const users = pgTable('users', {
   username: varchar('username', { length: 50 }),
   email: varchar('email', { length: 50 }).notNull(),
   password: varchar('password', { length: 100 }).notNull(),
-  role_id: integer('role_id').references(() => users.id),
+  role_id: integer('role_id').references(() => roles.id),
 });
 
 export const userRelation = relations(users, ({ one }) => ({
