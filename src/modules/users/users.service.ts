@@ -8,6 +8,7 @@ import { SQLWrapper, eq, or } from 'drizzle-orm';
 import { BadRequestException } from '@app/core/exceptions';
 import * as bcrypt from 'bcrypt';
 import { SALT_ROUNDS } from '@app/core/constants/auth.constants';
+import { ERROR_MESSAGES } from '@app/core/constants/errorMessages.constants';
 
 @Injectable()
 export class UsersService {
@@ -21,11 +22,11 @@ export class UsersService {
     });
 
     if (existingUser)
-      return new BadRequestException({ message: 'Email is already in use' });
+      return new BadRequestException({ message: ERROR_MESSAGES.EMAIL_TAKEN });
 
     const password = await bcrypt.hash(createUserDto.password, SALT_ROUNDS);
 
-    const user = await this.conn
+    const [user] = await this.conn
       .insert(schema.users)
       .values({ ...createUserDto, role_id: 1, password })
       .returning();
@@ -49,19 +50,47 @@ export class UsersService {
       }
     }
 
-    return await this.conn.query.users.findFirst({
+    const user = await this.conn.query.users.findFirst({
       where: or(...Object.values(whereCondition)),
       with: {
         role: true,
       },
     });
+
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(
+    id: number,
+    updateUser: Partial<typeof schema.users.$inferSelect>,
+  ) {
+    const user = await this.findOne({ id });
+
+    if (!user)
+      return new BadRequestException({
+        message: ERROR_MESSAGES.USER_EMAIL_NOT_FOUND,
+      });
+
+    const updatedUser = await this.conn
+      .update(schema.users)
+      .set(updateUser)
+      .where(eq(schema.users.id, user.id))
+      .returning();
+
+    return updatedUser;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const user = await this.findOne({ id });
+
+    if (!user)
+      return new BadRequestException({
+        message: ERROR_MESSAGES.USER_EMAIL_NOT_FOUND,
+      });
+
+    return await this.conn
+      .delete(schema.users)
+      .where(eq(schema.users.id, user.id))
+      .returning();
   }
 }
