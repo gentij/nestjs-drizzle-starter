@@ -26,7 +26,7 @@ export class UsersService {
 
     const password = await bcrypt.hash(createUserDto.password, SALT_ROUNDS);
 
-    const user = await this.conn
+    const [user] = await this.conn
       .insert(schema.users)
       .values({ ...createUserDto, role_id: 1, password })
       .returning();

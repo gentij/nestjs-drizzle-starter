@@ -1,17 +1,30 @@
-import { Test, TestingModule } from '@nestjs/testing';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Test } from '@nestjs/testing';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import * as schema from 'src/modules/drizzle/schema';
+import { DRIZZLE_ORM } from '@app/core/constants/db.constants';
+import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
 import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
 
-describe('UsersController', () => {
+describe('UserController', () => {
   let controller: UsersController;
+  let postgresJsDatabaseMock = {} as PostgresJsDatabase<typeof schema>;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const moduleRef = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [UsersService],
+      providers: [
+        {
+          provide: DRIZZLE_ORM,
+          useValue: postgresJsDatabaseMock,
+        },
+        UsersService,
+        JwtService,
+      ],
     }).compile();
 
-    controller = module.get<UsersController>(UsersController);
+    controller = moduleRef.get<UsersController>(UsersController);
   });
 
   it('should be defined', () => {
