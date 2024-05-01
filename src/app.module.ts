@@ -1,5 +1,5 @@
 import { Module, ValidationError, ValidationPipe } from '@nestjs/common';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import {
   AllExceptionsFilter,
   ValidationExceptionFilter,
@@ -13,6 +13,9 @@ import { NestDrizzleModule } from './modules/drizzle/drizzle.module';
 import * as schema from './modules/drizzle/schema';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './core/constants/auth.constants';
+import { AuthGuard } from './core/guards/AuthGuard';
 
 @Module({
   imports: [
@@ -29,6 +32,11 @@ import { AuthModule } from './modules/auth/auth.module';
       },
     }),
     AuthModule,
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: jwtConstants.expiresIn },
+    }),
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
@@ -45,6 +53,10 @@ import { AuthModule } from './modules/auth/auth.module';
             return errors[0];
           },
         }),
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })
