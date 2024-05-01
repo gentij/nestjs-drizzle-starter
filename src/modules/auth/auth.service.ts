@@ -4,7 +4,6 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import * as bcrypt from 'bcrypt';
-import { Public } from '@app/core/decorators/auth/IsPublic';
 import { BadRequestException } from '@app/core/exceptions';
 import { ERROR_MESSAGES } from '@app/core/constants/errorMessages.constants';
 

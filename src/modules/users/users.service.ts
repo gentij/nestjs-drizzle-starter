@@ -50,19 +50,47 @@ export class UsersService {
       }
     }
 
-    return await this.conn.query.users.findFirst({
+    const user = await this.conn.query.users.findFirst({
       where: or(...Object.values(whereCondition)),
       with: {
         role: true,
       },
     });
+
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(
+    id: number,
+    updateUser: Partial<typeof schema.users.$inferSelect>,
+  ) {
+    const user = await this.findOne({ id });
+
+    if (!user)
+      return new BadRequestException({
+        message: ERROR_MESSAGES.USER_EMAIL_NOT_FOUND,
+      });
+
+    const updatedUser = await this.conn
+      .update(schema.users)
+      .set(updateUser)
+      .where(eq(schema.users.id, user.id))
+      .returning();
+
+    return updatedUser;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const user = await this.findOne({ id });
+
+    if (!user)
+      return new BadRequestException({
+        message: ERROR_MESSAGES.USER_EMAIL_NOT_FOUND,
+      });
+
+    return await this.conn
+      .delete(schema.users)
+      .where(eq(schema.users.id, user.id))
+      .returning();
   }
 }
