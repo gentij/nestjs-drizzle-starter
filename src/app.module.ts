@@ -16,6 +16,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './core/constants/auth.constants';
 import { AuthGuard } from './core/guards/AuthGuard';
+import { RolesGuard } from './core/guards/RoleGuard';
+import { UsersService } from './modules/users/users.service';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { AuthGuard } from './core/guards/AuthGuard';
     }),
   ],
   providers: [
+    UsersService,
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_FILTER, useClass: ValidationExceptionFilter },
     { provide: APP_FILTER, useClass: BadRequestExceptionFilter },
@@ -57,6 +60,10 @@ import { AuthGuard } from './core/guards/AuthGuard';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

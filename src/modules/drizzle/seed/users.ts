@@ -1,5 +1,7 @@
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from '../schema';
+import * as bcrypt from 'bcrypt';
+import { SALT_ROUNDS } from '@app/core/constants/auth.constants';
 
 export const seedUsers = async (drizzle: PostgresJsDatabase<typeof schema>) => {
   const { users } = schema;
@@ -11,7 +13,7 @@ export const seedUsers = async (drizzle: PostgresJsDatabase<typeof schema>) => {
       email: 'admin@user.com',
       username: 'admin',
       role_id: 0,
-      password: 'pec',
+      password: await bcrypt.hash('Admin1234!', SALT_ROUNDS),
     },
   ];
 

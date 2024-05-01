@@ -10,7 +10,9 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from '@app/core/decorators/auth/Role';
+import { ROLES } from '../drizzle/interfaces/role.interfaces';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
