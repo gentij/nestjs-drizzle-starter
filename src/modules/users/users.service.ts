@@ -8,6 +8,7 @@ import { SQLWrapper, eq, or } from 'drizzle-orm';
 import { BadRequestException } from '@app/core/exceptions';
 import * as bcrypt from 'bcrypt';
 import { SALT_ROUNDS } from '@app/core/constants/auth.constants';
+import { ERROR_MESSAGES } from '@app/core/constants/errorMessages.constants';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +22,7 @@ export class UsersService {
     });
 
     if (existingUser)
-      return new BadRequestException({ message: 'Email is already in use' });
+      return new BadRequestException({ message: ERROR_MESSAGES.EMAIL_TAKEN });
 
     const password = await bcrypt.hash(createUserDto.password, SALT_ROUNDS);
 

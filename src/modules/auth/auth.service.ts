@@ -6,6 +6,7 @@ import { SignInDto } from './dto/sign-in.dto';
 import * as bcrypt from 'bcrypt';
 import { Public } from '@app/core/decorators/auth/IsPublic';
 import { BadRequestException } from '@app/core/exceptions';
+import { ERROR_MESSAGES } from '@app/core/constants/errorMessages.constants';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
 
     if (!user)
       return new BadRequestException({
-        message: "User with that email doesn't exist",
+        message: ERROR_MESSAGES.USER_EMAIL_NOT_FOUND,
       });
 
     if (!(await bcrypt.compare(password, user.password))) {
