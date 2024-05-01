@@ -14,5 +14,5 @@ import { seedUsers } from './users';
 
   await seedRoles(_drizzle);
   await seedUsers(_drizzle);
-  process.exit(1);
+  process.exit(0);
 })();
